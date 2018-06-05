@@ -1,0 +1,26 @@
+﻿@using EF20To21Test.Data
+@model IQueryable<News>
+@{ 
+    DateTimeOffset timeoffsetStart = DateTimeOffset.UtcNow.AddDays(-50);
+    var newsToShow = Model.Where(x => x.AddTime >= timeoffsetStart).Select(x=>new { x.Title,x.AddTime,UpdateTime = new DateTimeOffset(new DateTime(x.UpdateTime.Ticks,DateTimeKind.Local)) }).ToList();
+    var newsToShow2 = Model.Where(x => x.UpdateTime >= timeoffsetStart).Select(x => new { x.Title, x.AddTime, UpdateTime = new DateTimeOffset(new DateTime(x.UpdateTime.Ticks, DateTimeKind.Local)) }).ToList();
+}
+<div class="container">
+    <p>
+        <a asp-action="Test2" class="btn btn-info">查看test2</a>
+    </p>
+    <ul class="list-group">
+        @foreach (var item in newsToShow)
+        {
+            <li class="list-group-item">@item.Title -- @item.AddTime -- @item.UpdateTime</li>
+        }
+
+    </ul>
+    <hr />
+    <ul>
+        @foreach (var item in newsToShow2)
+        {
+            <li class="list-group-item">@item.Title -- @item.AddTime -- @item.UpdateTime</li>
+        }
+    </ul>
+</div>

@@ -1,0 +1,62 @@
+﻿@using EF20To21Test.Data
+@using Microsoft.EntityFrameworkCore
+@model IQueryable<News>
+@inject AppDbContext db
+@{ 
+    DateTimeOffset timeoffsetStart = DateTimeOffset.UtcNow.AddDays(-50);
+    var newsToShow = Model.Where(x=>x.Id > 10);
+}
+<div class="container">
+    <p>
+        <a asp-action="Index" class="btn btn-info">查看test1</a>
+    </p>
+    <ul class="list-group">
+        @foreach (var item in newsToShow.Take(5))
+        {
+            if (item.Id % 2 == 0)
+            {
+                var qu = await Model.Where(x => x.AddTime > item.AddTime).OrderByDescending(x => x.UpdateTime).ToListAsync();
+                var qux = db.NewsX.Where(x => x.NewsId == item.Id).FirstOrDefault();
+                <li class="list-group-item">
+                    <p>@item.Title -- @item.AddTime -- @item.UpdateTime</p>
+                    @foreach (var xitem in qu.Take(3))
+                    {
+                        <ul class="list-group">
+                            <li class="list-group-item">@xitem.Title   -- @qu.Count()  -- @qux?.Title</li>
+                        </ul>
+
+                    }
+                </li>
+            }
+            else
+            {
+                var qu = Model.Where(x => x.AddTime < item.AddTime).OrderByDescending(x => x.UpdateTime);
+                var qux = db.NewsX.Where(x => x.NewsId == item.Id).Take(2);
+                <li class="list-group-item">
+                    <p>@item.Title -- @item.AddTime -- @item.UpdateTime</p>
+                    <ul class="list-group">
+                        @foreach (var xitem in qu.Take(3))
+                        {
+
+                            <li class="list-group-item">@xitem.Title  -- @qu.Count() -- @qux.Count()</li>
+
+
+                        }
+                    </ul>
+                    <ul class="list-group">
+                        @foreach (var xitem in qux)
+                        {
+                            var news = await db.News.Where(x => x.Id == xitem.NewsId).ToListAsync();
+                            <li class="list-group-item">@news.FirstOrDefault()?.Title  -- @news.FirstOrDefault()?.Id -- @xitem.Id</li>
+
+
+                        }
+                    </ul>
+                </li>
+            }
+        }
+
+    </ul>
+    <hr />
+    
+</div>
